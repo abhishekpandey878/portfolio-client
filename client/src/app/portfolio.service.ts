@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { buildApiUrl } from './app-config';
 import {
   AuthUser,
   EditorSectionKey,
@@ -16,21 +17,21 @@ export class PortfolioService {
   private readonly tokenKey = 'portfolio_admin_token';
 
   getProfile(): Observable<PortfolioProfile> {
-    return this.http.get<PortfolioProfile>('/api/profile');
+    return this.http.get<PortfolioProfile>(buildApiUrl('/api/profile'));
   }
 
   updateSection<T>(section: EditorSectionKey, payload: unknown): Observable<SectionMutationResponse<T>> {
-    return this.http.put<SectionMutationResponse<T>>(`/api/profile/sections/${section}`, payload, {
+    return this.http.put<SectionMutationResponse<T>>(buildApiUrl(`/api/profile/sections/${section}`), payload, {
       headers: this.getAuthHeaders()
     });
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>('/api/auth/login', { email, password });
+    return this.http.post<LoginResponse>(buildApiUrl('/api/auth/login'), { email, password });
   }
 
   getSession(): Observable<{ user: AuthUser }> {
-    return this.http.get<{ user: AuthUser }>('/api/auth/session', {
+    return this.http.get<{ user: AuthUser }>(buildApiUrl('/api/auth/session'), {
       headers: this.getAuthHeaders()
     });
   }

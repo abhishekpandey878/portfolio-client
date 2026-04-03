@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prestart": "node scripts/write-app-config.mjs",
+    "prebuild": "node scripts/write-app-config.mjs",
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build"
   },
