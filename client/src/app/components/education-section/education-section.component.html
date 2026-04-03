@@ -1,0 +1,28 @@
+<article class="panel panel-full reveal-on-scroll" id="education">
+  <button
+    class="card-edit-btn"
+    *ngIf="showEditTools"
+    type="button"
+    (click)="editRequested.emit()"
+    aria-label="Edit education"
+    style="position: absolute; top: 18px; right: 18px; left: auto; z-index: 2;">
+    &#9998;
+  </button>
+  <div class="section-header compact-header">
+    <div>
+      <p class="section-tag">Education</p>
+      <h2>{{ profile.sectionTitles.education }}</h2>
+    </div>
+  </div>
+  <div class="timeline education-list">
+    <div class="timeline-item" *ngFor="let item of profile.education">
+      <div class="timeline-head">
+        <div>
+          <h3>{{ item.degree }}</h3>
+          <p class="timeline-company">{{ item.institution }}</p>
+        </div>
+        <span class="timeline-period">{{ item.period }}</span>
+      </div>
+    </div>
+  </div>
+</article>

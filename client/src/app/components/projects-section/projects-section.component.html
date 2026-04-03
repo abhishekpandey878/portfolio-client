@@ -1,0 +1,32 @@
+<article class="panel panel-full reveal-on-scroll" id="projects">
+  <button
+    class="card-edit-btn"
+    *ngIf="showEditTools"
+    type="button"
+    (click)="editRequested.emit()"
+    aria-label="Edit projects"
+    style="position: absolute; top: 18px; right: 18px; left: auto; z-index: 2;">
+    &#9998;
+  </button>
+  <div class="section-header">
+    <div>
+      <p class="section-tag">Projects</p>
+      <h2>{{ profile.sectionTitles.projects }}</h2>
+    </div>
+  </div>
+  <div class="project-grid project-grid-wide">
+    <div class="project-card" *ngFor="let project of profile.projects">
+      <div class="project-top">
+        <div>
+          <h3>{{ project.name }}</h3>
+          <p class="project-caption">Project showcase</p>
+        </div>
+        <a *ngIf="project.link" [href]="project.link" target="_blank" rel="noreferrer">View live</a>
+      </div>
+      <p class="project-description">{{ project.description }}</p>
+      <div class="stack-row">
+        <span *ngFor="let tech of project.stack">{{ tech }}</span>
+      </div>
+    </div>
+  </div>
+</article>

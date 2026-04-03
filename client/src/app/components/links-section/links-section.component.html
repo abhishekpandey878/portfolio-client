@@ -1,0 +1,26 @@
+<article class="panel panel-half reveal-on-scroll" id="links">
+  <button
+    class="card-edit-btn"
+    *ngIf="showEditTools"
+    type="button"
+    (click)="editRequested.emit()"
+    aria-label="Edit links"
+    style="position: absolute; top: 18px; right: 18px; left: auto; z-index: 2;">
+    &#9998;
+  </button>
+  <div class="section-header compact-header">
+    <div>
+      <p class="section-tag">Links</p>
+      <h2>{{ profile.sectionTitles.links }}</h2>
+    </div>
+  </div>
+  <div class="link-list">
+    <a class="link-card" *ngFor="let link of profile.socialLinks" [href]="link.url" target="_blank" rel="noreferrer">
+      <div>
+        <p class="link-label">{{ link.label }}</p>
+        <strong>{{ link.url }}</strong>
+      </div>
+      <span class="link-arrow">Open</span>
+    </a>
+  </div>
+</article>

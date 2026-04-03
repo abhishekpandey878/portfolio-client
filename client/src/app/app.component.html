@@ -1,0 +1,335 @@
+<main class="loading-state" *ngIf="isLoading">
+  <p>Loading portfolio...</p>
+</main>
+
+<app-topbar
+  *ngIf="!isLoading"
+  [isAuthenticated]="isAuthenticated()"
+  [showAdminActions]="isAdminRoute"
+  (logoutRequested)="logout()"></app-topbar>
+
+<main class="page-shell" *ngIf="!isLoading">
+  <p class="floating-status" *ngIf="statusMessage">{{ statusMessage }}</p>
+
+  <ng-container *ngIf="profile as profileData; else emptyState">
+    <app-hero-profile
+      [profile]="profileData"
+      [animatedHeadline]="animatedHeadline"
+      [animatedSummary]="animatedSummary"
+      [isSummaryVisible]="isSummaryVisible"
+      [showEditTools]="isAdminRoute"
+      (editRequested)="openSectionEditor('profile')">
+    </app-hero-profile>
+
+    <app-about-section
+      [profile]="profileData"
+      [showEditTools]="isAdminRoute"
+      (editRequested)="openSectionEditor('about')">
+    </app-about-section>
+
+    <section class="content-grid">
+      <app-skills-section
+        [profile]="profileData"
+        [showEditTools]="isAdminRoute"
+        (editRequested)="openSectionEditor('skills')">
+      </app-skills-section>
+
+      <app-links-section
+        [profile]="profileData"
+        [showEditTools]="isAdminRoute"
+        (editRequested)="openSectionEditor('links')">
+      </app-links-section>
+
+      <app-experience-section
+        [profile]="profileData"
+        [showEditTools]="isAdminRoute"
+        (editRequested)="openSectionEditor('experience')">
+      </app-experience-section>
+
+      <app-projects-section
+        [profile]="profileData"
+        [showEditTools]="isAdminRoute"
+        (editRequested)="openSectionEditor('projects')">
+      </app-projects-section>
+
+      <app-education-section
+        [profile]="profileData"
+        [showEditTools]="isAdminRoute"
+        (editRequested)="openSectionEditor('education')">
+      </app-education-section>
+    </section>
+
+    <app-contact-section
+      [profile]="profileData"
+      [showEditTools]="isAdminRoute"
+      (editRequested)="openSectionEditor('contact')">
+    </app-contact-section>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <section class="empty-state">
+      <h2>No portfolio content yet</h2>
+      <p>Use the section edit buttons to sign in and update portfolio content.</p>
+    </section>
+  </ng-template>
+
+  <section class="modal-backdrop" *ngIf="isLoginModalOpen" (click)="closeLoginModal()">
+    <div class="login-modal" (click)="$event.stopPropagation()">
+      <div class="login-modal-header">
+        <h3>Admin Login</h3>
+        <button class="modal-close" type="button" (click)="closeLoginModal()" aria-label="Close login">
+          &times;
+        </button>
+      </div>
+      <p class="login-modal-copy">Log in to edit portfolio content.</p>
+      <p class="login-error modal-error" *ngIf="loginError">{{ loginError }}</p>
+      <form class="login-modal-form" (ngSubmit)="login()">
+        <input [(ngModel)]="loginEmail" name="loginEmail" type="email" placeholder="Admin email" />
+        <input [(ngModel)]="loginPassword" name="loginPassword" type="password" placeholder="Password" />
+        <button class="primary-btn" type="submit" [disabled]="isLoggingIn">Login</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="modal-backdrop" *ngIf="activeEditorSection && editableProfile" (click)="closeSectionEditor()">
+    <div class="section-editor-modal" (click)="$event.stopPropagation()">
+      <div class="login-modal-header">
+        <h3>Edit {{ activeEditorSection | titlecase }}</h3>
+        <button class="modal-close" type="button" (click)="closeSectionEditor()" aria-label="Close editor">
+          &times;
+        </button>
+      </div>
+
+      <div class="section-editor-body">
+        <ng-container [ngSwitch]="activeEditorSection">
+          <div *ngSwitchCase="'profile'" class="modal-form-grid">
+            <label>
+              <span>Name</span>
+              <input [(ngModel)]="editableProfile.name" name="modal-name" />
+            </label>
+            <label>
+              <span>Headline</span>
+              <input [(ngModel)]="editableProfile.headline" name="modal-headline" />
+            </label>
+            <label>
+              <span>Location</span>
+              <input [(ngModel)]="editableProfile.location" name="modal-location" />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input [(ngModel)]="editableProfile.phone" name="modal-phone" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input [(ngModel)]="editableProfile.email" name="modal-email" />
+            </label>
+            <label>
+              <span>Resume path</span>
+              <input [(ngModel)]="editableProfile.resumePath" name="modal-resume" />
+            </label>
+            <label class="modal-full">
+              <span>Profile photo URL</span>
+              <input [(ngModel)]="editableProfile.profilePhoto" name="modal-profile-photo" />
+            </label>
+            <label class="modal-full">
+              <span>Upload profile photo</span>
+              <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+            </label>
+            <div class="photo-editor modal-full" *ngIf="editableProfile.profilePhoto">
+              <img [src]="editableProfile.profilePhoto" alt="Profile photo preview" />
+              <button type="button" class="ghost-btn danger-text" (click)="clearPhoto()">Remove photo</button>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="'about'" class="modal-form-grid">
+            <label class="modal-full">
+              <span>About heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.about" name="modal-about-heading" />
+            </label>
+            <label class="modal-full">
+              <span>Summary</span>
+              <textarea [(ngModel)]="editableProfile.summary" name="modal-summary" rows="5"></textarea>
+            </label>
+            <div class="modal-list-block modal-full">
+              <div class="section-title-row">
+                <h4>Highlights</h4>
+              </div>
+              <div class="repeat-list">
+                <div class="repeat-item inline-item" *ngFor="let highlight of editableProfile.highlights; let i = index; trackBy: trackByIndex">
+                  <input [(ngModel)]="editableProfile.highlights[i]" [name]="'modal-highlight-' + i" />
+                  <button type="button" class="ghost-btn danger-text" (click)="removeHighlight(i)">Delete</button>
+                </div>
+              </div>
+              <button type="button" class="ghost-btn" (click)="addHighlight()">Add</button>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="'skills'" class="modal-list-block">
+            <div class="section-title-row">
+              <h4>Skills</h4>
+            </div>
+            <label>
+              <span>Skills heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.skills" name="modal-skills-heading" />
+            </label>
+            <div class="repeat-list">
+              <div class="repeat-item inline-item" *ngFor="let skill of editableProfile.skills; let i = index; trackBy: trackByIndex">
+                <input [(ngModel)]="editableProfile.skills[i]" [name]="'modal-skill-' + i" />
+                <button type="button" class="ghost-btn danger-text" (click)="removeSkill(i)">Delete</button>
+              </div>
+            </div>
+            <button type="button" class="ghost-btn" (click)="addSkill()">Add</button>
+          </div>
+
+          <div *ngSwitchCase="'links'" class="modal-list-block">
+            <div class="section-title-row">
+              <h4>Links</h4>
+            </div>
+            <label>
+              <span>Links heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.links" name="modal-links-heading" />
+            </label>
+            <div class="repeat-list">
+              <div class="repeat-item card-item" *ngFor="let link of editableProfile.socialLinks; let i = index; trackBy: trackByIndex">
+                <label>
+                  <span>Label</span>
+                  <input [(ngModel)]="link.label" [name]="'modal-link-label-' + i" />
+                </label>
+                <label>
+                  <span>URL</span>
+                  <input [(ngModel)]="link.url" [name]="'modal-link-url-' + i" />
+                </label>
+                <button type="button" class="ghost-btn danger-text" (click)="removeLink(i)">Delete</button>
+              </div>
+            </div>
+            <button type="button" class="ghost-btn" (click)="addLink()">Add</button>
+          </div>
+
+          <div *ngSwitchCase="'experience'" class="modal-list-block">
+            <div class="section-title-row">
+              <h4>Experience</h4>
+            </div>
+            <label>
+              <span>Experience heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.experience" name="modal-experience-heading" />
+            </label>
+            <div class="repeat-list">
+              <div class="repeat-item card-item" *ngFor="let item of editableProfile.experience; let i = index; trackBy: trackByIndex">
+                <label>
+                  <span>Role</span>
+                  <input [(ngModel)]="item.role" [name]="'modal-experience-role-' + i" />
+                </label>
+                <label>
+                  <span>Company</span>
+                  <input [(ngModel)]="item.company" [name]="'modal-experience-company-' + i" />
+                </label>
+                <label>
+                  <span>Period</span>
+                  <input [(ngModel)]="item.period" [name]="'modal-experience-period-' + i" />
+                </label>
+                <label>
+                  <span>Description (one point per line)</span>
+                  <textarea [(ngModel)]="item.description" [name]="'modal-experience-description-' + i" rows="4"></textarea>
+                </label>
+                <button type="button" class="ghost-btn danger-text" (click)="removeExperience(i)">Delete</button>
+              </div>
+            </div>
+            <button type="button" class="ghost-btn" (click)="addExperience()">Add</button>
+          </div>
+
+          <div *ngSwitchCase="'projects'" class="modal-list-block">
+            <div class="section-title-row">
+              <h4>Projects</h4>
+            </div>
+            <label>
+              <span>Projects heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.projects" name="modal-projects-heading" />
+            </label>
+            <div class="repeat-list">
+              <div class="repeat-item card-item" *ngFor="let project of editableProfile.projects; let i = index; trackBy: trackByIndex">
+                <label>
+                  <span>Name</span>
+                  <input [(ngModel)]="project.name" [name]="'modal-project-name-' + i" />
+                </label>
+                <label>
+                  <span>Stack (comma separated)</span>
+                  <input
+                    [ngModel]="getProjectStackValue(project)"
+                    (ngModelChange)="updateProjectStack(project, $event)"
+                    [name]="'modal-project-stack-' + i"
+                  />
+                </label>
+                <label>
+                  <span>Project link</span>
+                  <input [(ngModel)]="project.link" [name]="'modal-project-link-' + i" />
+                </label>
+                <label>
+                  <span>Description</span>
+                  <textarea [(ngModel)]="project.description" [name]="'modal-project-description-' + i" rows="4"></textarea>
+                </label>
+                <button type="button" class="ghost-btn danger-text" (click)="removeProject(i)">Delete</button>
+              </div>
+            </div>
+            <button type="button" class="ghost-btn" (click)="addProject()">Add</button>
+          </div>
+
+          <div *ngSwitchCase="'education'" class="modal-list-block">
+            <div class="section-title-row">
+              <h4>Education</h4>
+            </div>
+            <label>
+              <span>Education heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.education" name="modal-education-heading" />
+            </label>
+            <div class="repeat-list">
+              <div class="repeat-item card-item" *ngFor="let item of editableProfile.education; let i = index; trackBy: trackByIndex">
+                <label>
+                  <span>Degree</span>
+                  <input [(ngModel)]="item.degree" [name]="'modal-education-degree-' + i" />
+                </label>
+                <label>
+                  <span>Institution</span>
+                  <input [(ngModel)]="item.institution" [name]="'modal-education-institution-' + i" />
+                </label>
+                <label>
+                  <span>Period</span>
+                  <input [(ngModel)]="item.period" [name]="'modal-education-period-' + i" />
+                </label>
+                <button type="button" class="ghost-btn danger-text" (click)="removeEducation(i)">Delete</button>
+              </div>
+            </div>
+            <button type="button" class="ghost-btn" (click)="addEducation()">Add</button>
+          </div>
+
+          <div *ngSwitchCase="'contact'" class="modal-form-grid">
+            <label class="modal-full">
+              <span>Contact heading</span>
+              <input [(ngModel)]="editableProfile.sectionTitles.contact" name="modal-contact-heading" />
+            </label>
+            <label>
+              <span>Location</span>
+              <input [(ngModel)]="editableProfile.location" name="modal-contact-location" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input [(ngModel)]="editableProfile.email" name="modal-contact-email" />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input [(ngModel)]="editableProfile.phone" name="modal-contact-phone" />
+            </label>
+            <label class="modal-full">
+              <span>Resume path</span>
+              <input [(ngModel)]="editableProfile.resumePath" name="modal-contact-resume" />
+            </label>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="modal-actions">
+        <button class="ghost-btn" type="button" (click)="closeSectionEditor()">Cancel</button>
+        <button class="primary-btn" type="button" (click)="saveSection()" [disabled]="isSaving">Update</button>
+      </div>
+    </div>
+  </section>
+</main>

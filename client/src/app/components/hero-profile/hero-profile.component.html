@@ -1,0 +1,44 @@
+<section class="hero-card reveal-on-scroll revealed" id="about">
+  <button
+    class="card-edit-btn"
+    *ngIf="showEditTools"
+    type="button"
+    (click)="editRequested.emit()"
+    aria-label="Edit profile section"
+    style="position: absolute; top: 18px; right: 18px; left: auto; z-index: 2;">
+    &#9998;
+  </button>
+  <div class="hero-copy">
+    <p class="eyebrow">Full Stack Engineer (MEAN)</p>
+    <h1>{{ profile.name }}</h1>
+    <p class="headline">{{ animatedHeadline || profile.headline }}</p>
+    <p class="summary" *ngIf="isSummaryVisible">{{ animatedSummary || profile.summary }}</p>
+
+    <div class="hero-actions">
+      <a class="primary-btn" [href]="profile.resumePath" download>Download Resume</a>
+      <a class="secondary-btn" href="#contact">Contact Me</a>
+    </div>
+
+    <div class="hero-metrics">
+      <a class="metric-card" href="#skills">
+        <strong>{{ profile.skills.length }}</strong>
+        <span>Core Skills</span>
+      </a>
+      <a class="metric-card" href="#projects">
+        <strong>{{ profile.projects.length }}</strong>
+        <span>Featured Projects</span>
+      </a>
+      <a class="metric-card" href="#experience">
+        <strong>{{ profile.experience.length }}</strong>
+        <span>Experience Entries</span>
+      </a>
+    </div>
+  </div>
+  <aside class="hero-side">
+    <div class="portrait-card">
+      <div class="photo-frame">
+        <img [src]="profile.profilePhoto" [alt]="profile.name + ' profile photo'" />
+      </div>
+    </div>
+  </aside>
+</section>

@@ -1,0 +1,37 @@
+<section class="topbar topbar-nav">
+  <div class="brand-block">
+    <p class="eyebrow">Abhishek Pandey</p>
+  </div>
+  <button
+    class="menu-toggle"
+    type="button"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="isMenuOpen"
+    aria-controls="mobile-nav"
+    aria-label="Toggle navigation">
+    <span class="menu-toggle-grid" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+  <nav class="section-nav" [class.menu-open]="isMenuOpen" id="mobile-nav">
+    <a href="#about" (click)="closeMenu()">About</a>
+    <a href="#skills" (click)="closeMenu()">Skills</a>
+    <a href="#experience" (click)="closeMenu()">Experience</a>
+    <a href="#projects" (click)="closeMenu()">Projects</a>
+    <a href="#education" (click)="closeMenu()">Education</a>
+    <a href="#contact" (click)="closeMenu()">Contact</a>
+  </nav>
+  <div class="topbar-actions">
+    <button class="ghost-btn" *ngIf="showAdminActions && isAuthenticated" type="button" (click)="onLogout()">
+      Logout
+    </button>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+<footer class="page-footer reveal-on-scroll" id="contact">
+  <button
+    class="card-edit-btn"
+    *ngIf="showEditTools"
+    type="button"
+    (click)="editRequested.emit()"
+    aria-label="Edit contact"
+    style="position: absolute; top: 18px; right: 18px; left: auto; z-index: 2;">
+    &#9998;
+  </button>
+  <div class="section-header compact-header contact-heading">
+    <div>
+      <p class="section-tag">Contact</p>
+      <h2>{{ profile.sectionTitles.contact }}</h2>
+    </div>
+  </div>
+  <div class="profile-facts contact-facts">
+    <a class="contact-item" [href]="'tel:' + profile.phone">
+      <span class="contact-symbol" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.11.37 2.3.56 3.58.56a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.85 21 3 13.15 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.28.19 2.47.56 3.58a1 1 0 0 1-.24 1.01z"/>
+        </svg>
+      </span>
+      <strong>{{ profile.phone }}</strong>
+    </a>
+    <a
+      class="contact-item"
+      [href]="'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeEmail(profile.email)"
+      target="_blank"
+      rel="noreferrer">
+      <span class="contact-symbol" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2 8 5 8-5"/>
+        </svg>
+      </span>
+      <strong>{{ profile.email }}</strong>
+    </a>
+    <div class="contact-item">
+      <span class="contact-symbol" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M12 21s-6-5.33-6-10a6 6 0 1 1 12 0c0 4.67-6 10-6 10zm0-8.5A2.5 2.5 0 1 0 12 7a2.5 2.5 0 0 0 0 5.5z"/>
+        </svg>
+      </span>
+      <strong>{{ profile.location }}</strong>
+    </div>
+  </div>
+</footer>
